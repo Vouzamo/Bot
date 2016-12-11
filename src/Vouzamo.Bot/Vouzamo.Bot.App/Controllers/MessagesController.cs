@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
-using Newtonsoft.Json;
 
-namespace Vouzamo.Bot.App
+namespace Vouzamo.Bot.App.Controllers
 {
     [BotAuthentication]
     public class MessagesController : ApiController
@@ -21,12 +18,23 @@ namespace Vouzamo.Bot.App
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                // calculate something for us to return
-                int length = (activity.Text ?? string.Empty).Length;
+                var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
-                // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
+                Activity reply;
+
+                if (IsQuestion(activity.Text))
+                {
+                    reply = activity.CreateReply("You asked a question.");
+                }
+                else if(IsCommand(activity.Text))
+                {
+                    reply = activity.CreateReply("You issued a command.");
+                }
+                else
+                {
+                    reply = activity.CreateReply("You made a statement.");
+                }
+
                 await connector.Conversations.ReplyToActivityAsync(reply);
             }
             else
@@ -35,6 +43,18 @@ namespace Vouzamo.Bot.App
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
+        }
+
+        private bool IsQuestion(string message)
+        {
+            return message.Contains("?") || message.Contains("who") || message.Contains("what") ||
+                   message.Contains("where") || message.Contains("when") || message.Contains("why") ||
+                   message.Contains("how");
+        }
+
+        private bool IsCommand(string message)
+        {
+            return message.Contains("do");
         }
 
         private Activity HandleSystemMessage(Activity message)
