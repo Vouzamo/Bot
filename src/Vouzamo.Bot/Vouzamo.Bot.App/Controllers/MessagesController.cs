@@ -3,7 +3,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using Vouzamo.Bot.App.Dialogs;
 
 namespace Vouzamo.Bot.App.Controllers
 {
@@ -21,6 +23,11 @@ namespace Vouzamo.Bot.App.Controllers
                 var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
                 Activity reply;
+
+                if (activity.Text.StartsWith("echo"))
+                {
+                    await Conversation.SendAsync(activity, () => new EchoDialog());
+                }
 
                 if (IsQuestion(activity.Text))
                 {
