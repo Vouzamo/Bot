@@ -24,7 +24,7 @@ namespace Vouzamo.Bot.App.Controllers
 
                 Activity reply;
 
-                if (activity.Text.StartsWith("echo"))
+                if (activity.Text.StartsWith("echo "))
                 {
                     await Conversation.SendAsync(activity, () => new EchoDialog());
                 }

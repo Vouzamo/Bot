@@ -17,7 +17,9 @@ namespace Vouzamo.Bot.App.Dialogs
         {
             var message = await argument;
 
-            await context.PostAsync(message.Text);
+            var text = message.Text.Substring(5, message.Text.Length - 5);
+
+            await context.PostAsync(text);
 
             context.Wait(MessageReceivedAsync);
         }
