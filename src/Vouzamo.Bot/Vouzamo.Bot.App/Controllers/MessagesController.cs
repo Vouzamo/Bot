@@ -29,11 +29,11 @@ namespace Vouzamo.Bot.App.Controllers
                     await Conversation.SendAsync(activity, () => new EchoDialog());
                 }
 
-                if (IsQuestion(activity.Text))
+                if (IsQuestion(activity.Text.ToLower()))
                 {
                     reply = activity.CreateReply("You asked a question.");
                 }
-                else if(IsCommand(activity.Text))
+                else if(IsCommand(activity.Text.ToLower()))
                 {
                     reply = activity.CreateReply("You issued a command.");
                 }
@@ -54,6 +54,7 @@ namespace Vouzamo.Bot.App.Controllers
 
         private bool IsQuestion(string message)
         {
+            // Does the message contain interrogative words? This is naive and machine learning would yield improvements
             return message.Contains("?") || message.Contains("who") || message.Contains("what") ||
                    message.Contains("where") || message.Contains("when") || message.Contains("why") ||
                    message.Contains("how");
@@ -61,7 +62,8 @@ namespace Vouzamo.Bot.App.Controllers
 
         private bool IsCommand(string message)
         {
-            return message.Contains("do");
+            // Does the message start with a verb and contain no subject or past tense?
+            return (message.Contains("do") || message.Contains("get")) && (!message.Contains("i") || !message.Contains("you"));
         }
 
         private Activity HandleSystemMessage(Activity message)
